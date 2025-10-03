@@ -1,33 +1,108 @@
-// server.js
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const { evaluate } = require("mathjs");
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-const app = express();
-const port = 3000;
+export default function ResumeBuilder() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    education: "",
+    experience: "",
+    skills: "",
+  });
 
-app.use(cors());
-app.use(bodyParser.json());
+  const [preview, setPreview] = useState(false);
 
-// API to calculate expressions
-app.post("/calculate", (req, res) => {
-  try {
-    const { expression } = req.body;
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-    if (!expression) {
-      return res.status(400).json({ error: "No expression provided" });
-    }
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
+      <Card className="w-full max-w-3xl shadow-lg rounded-2xl">
+        <CardContent className="p-6 space-y-6">
+          {!preview ? (
+            <>
+              <h1 className="text-2xl font-bold text-center">Resume Builder</h1>
+              <div className="space-y-4">
+                <Input
+                  placeholder="Full Name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                />
+                <Input
+                  placeholder="Email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                />
+                <Input
+                  placeholder="Phone"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                />
+                <Textarea
+                  placeholder="Education"
+                  name="education"
+                  value={form.education}
+                  onChange={handleChange}
+                />
+                <Textarea
+                  placeholder="Work Experience"
+                  name="experience"
+                  value={form.experience}
+                  onChange={handleChange}
+                />
+                <Textarea
+                  placeholder="Skills (comma separated)"
+                  name="skills"
+                  value={form.skills}
+                  onChange={handleChange}
+                />
+              </div>
+              <Button
+                className="w-full mt-4"
+                onClick={() => setPreview(true)}
+              >
+                Preview Resume
+              </Button>
+            </>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold text-center">{form.name}</h1>
+              <p className="text-center">{form.email} | {form.phone}</p>
+              <hr className="my-4" />
 
-    // Evaluate safely using mathjs
-    const result = evaluate(expression);
+              <h2 className="text-xl font-semibold">Education</h2>
+              <p>{form.education}</p>
 
-    res.json({ expression, result });
-  } catch (error) {
-    res.status(400).json({ error: "Invalid expression" });
-  }
-});
+              <h2 className="text-xl font-semibold mt-4">Experience</h2>
+              <p>{form.experience}</p>
 
-app.listen(port, () => {
-  console.log(`Scientific Calculator backend running at http://localhost:${port}`);
-});
+              <h2 className="text-xl font-semibold mt-4">Skills</h2>
+              <ul className="list-disc ml-6">
+                {form.skills.split(",").map((skill, idx) => (
+                  <li key={idx}>{skill.trim()}</li>
+                ))}
+              </ul>
+
+              <div className="flex gap-4 mt-6">
+                <Button className="w-full" variant="outline" onClick={() => setPreview(false)}>
+                  Edit
+                </Button>
+                <Button className="w-full" onClick={() => window.print()}>
+                  Download PDF
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
