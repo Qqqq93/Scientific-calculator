@@ -17,7 +17,7 @@ app.post("/calculate", (req, res) => {
 
     if (!expression) {
       return res.status(400).json({ error: "No expression provided" });
-    }
+    
 
     // Evaluate safely using mathjs
     const result = evaluate(expression);
